@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BitHosting Argentina - Hosting Local</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<!-- Header -->
+<header>
+    <div class="container">
+        <nav>
+            <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://via.placeholder.com/40x40?text=B" alt="Logo BitHosting" style="width:40px;height:40px;border-radius:8px;background:#00d4ff;">
+                BitHosting
+            </div>
+            <div style="flex:1;"></div>
+            <ul class="nav-links">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#precios">Precios</a></li>
+                <li><a href="#soporte">Soporte</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+                <li><a href="#cuenta" id="miCuentaLink" style="display: none;">Mi Cuenta</a></li>
+            </ul>
+            <div class="user-section">
+                <button class="login-btn" id="loginBtn" onclick="loginWithGoogle()">
+                    <span>Iniciar Sesión</span>
+                </button>
+                <div class="user-profile" id="userProfile">
+                    <span class="user-name" id="userName"></span>
+                    <div class="user-dropdown">
+                        <img class="user-avatar" id="userAvatar" onclick="toggleDropdown()" src="" alt="User">
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <div class="dropdown-item">
+                                <a href="#panel">Panel de Control</a>
+                            </div>
+                            <div class="dropdown-item">
+                                <a href="#mis-vps">Mis VPS</a>
+                            </div>
+                            <div class="dropdown-item">
+                                <a href="#facturas">Facturación</a>
+                            </div>
+                            <div class="dropdown-item">
+                                <a href="#soporte">Soporte</a>
+                            </div>
+                            <div class="dropdown-item" onclick="logout()">
+                                Cerrar Sesión
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<!-- Login Modal -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <span class="modal-close" onclick="closeLoginModal()">&times;</span>
+        <h3>Iniciar Sesión</h3>
+        <p>Usa tu cuenta de Google para acceder</p>
+        <div id="google-signin-button"></div>
+    </div>
+</div>
+
+<!-- Hero Section -->
+<section class="hero with-server-bg" id="inicio">
+    <div class="container">
+        <div class="hero-content">
+            <h1>BitHosting</h1>
+            <p>Servidores virtuales de alto rendimiento con baja latencia, soporte en español y precios en pesos</p>
+            <a href="#pricing" class="cta-button">Ver Planes</a>
+        </div>
+    </div>
+</section>
+<!-- Carousel Section -->
+<section class="carousel-section">
+    <div class="container">
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">Nuestros Servicios</h2>
+        <div class="carousel-container">
+            <div class="carousel-wrapper" id="carouselWrapper">
+                <div class="carousel-slide">
+                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=400&fit=crop" alt="Datacenter">
+                    <div class="carousel-caption">
+                        <h3>Infraestructura Moderna</h3>
+                        <p>Servidores de última generación con SSD y procesadores Intel de alto rendimiento</p>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=400&fit=crop" alt="Conexión">
+                    <div class="carousel-caption">
+                        <h3>Conectividad Premium</h3>
+                        <p>Conexión directa a Buenos Aires con latencia ultra baja para usuarios argentinos</p>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://images.unsplash.com/photo-1560472355-536de3962603?w=800&h=400&fit=crop" alt="Soporte">
+                    <div class="carousel-caption">
+                        <h3>Soporte 24/7</h3>
+                        <p>Atención técnica especializada en español durante horarios comerciales argentinos</p>
+                    </div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop" alt="Seguridad">
+                    <div class="carousel-caption">
+                        <h3>Máxima Seguridad</h3>
+                        <p>Backups automáticos, firewall configurado y monitoreo constante de todos los servicios</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-nav carousel-prev" onclick="changeSlide(-1)">‹</button>
+            <button class="carousel-nav carousel-next" onclick="changeSlide(1)">›</button>
+        </div>
+        <div class="carousel-dots">
+            <span class="carousel-dot active" onclick="currentSlide(1)"></span>
+            <span class="carousel-dot" onclick="currentSlide(2)"></span>
+            <span class="carousel-dot" onclick="currentSlide(3)"></span>
+            <span class="carousel-dot" onclick="currentSlide(4)"></span>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="features">
+    <div class="container">
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 1rem;">¿Por qué elegir VPS Argentina?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🇦🇷</div>
+                <h3>Servidores Locales</h3>
+                <p>Ubicados en Buenos Aires para mínima latencia. Ideal para usuarios argentinos.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Setup Instantáneo</h3>
+                <p>Tu servidor listo en menos de 5 minutos. Sin esperas ni complicaciones.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3>Soporte en Español</h3>
+                <p>Atención técnica en tu idioma y horario argentino. WhatsApp directo.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Precios en Pesos</h3>
+                <p>Sin fluctuaciones del dólar. Facturación local argentina.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing" id="precios">
+    <div class="container">
+        <h2>Planes VPS Linux</h2>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="plan-name">Básico</div>
+                <div class="plan-price">$8.000</div>
+                <div class="plan-period">ARS / mes</div>
+                <ul class="plan-features">
+                    <li>1 vCPU</li>
+                    <li>1 GB RAM</li>
+                    <li>25 GB SSD</li>
+                    <li>1 IP Pública</li>
+                    <li>Ubuntu/CentOS</li>
+                    <li>Acceso SSH</li>
+                </ul>
+                <a href="#" class="cta-button">Elegir Plan</a>
+            </div>
+
+            <div class="pricing-card popular">
+                <div class="plan-name">Estándar</div>
+                <div class="plan-price">$15.000</div>
+                <div class="plan-period">ARS / mes</div>
+                <ul class="plan-features">
+                    <li>2 vCPU</li>
+                    <li>2 GB RAM</li>
+                    <li>50 GB SSD</li>
+                    <li>1 IP Pública</li>
+                    <li>Ubuntu/CentOS/Debian</li>
+                    <li>Backup Semanal</li>
+                </ul>
+                <a href="#" class="cta-button">Elegir Plan</a>
+            </div>
+
+            <div class="pricing-card">
+                <div class="plan-name">Profesional</div>
+                <div class="plan-price">$25.000</div>
+                <div class="plan-period">ARS / mes</div>
+                <ul class="plan-features">
+                    <li>4 vCPU</li>
+                    <li>4 GB RAM</li>
+                    <li>80 GB SSD</li>
+                    <li>1 IP Pública</li>
+                    <li>Todas las distros</li>
+                    <li>Backup Diario</li>
+                </ul>
+                <a href="#" class="cta-button">Elegir Plan</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer id="contacto">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contacto</h3>
+                <a href="#">WhatsApp: +54 9 11 XXXX-XXXX</a>
+                <a href="#">Email: soporte@vpsargentina.com</a>
+                <a href="#">Buenos Aires, Argentina</a>
+            </div>
+            <div class="footer-section">
+                <h3>Servicios</h3>
+                <a href="#">VPS Linux</a>
+                <a href="#">Migración Gratuita</a>
+                <a href="#">Soporte Técnico</a>
+                <a href="#">Backups</a>
+            </div>
+            <div class="footer-section">
+                <h3>Recursos</h3>
+                <a href="#">Documentación</a>
+                <a href="#">Tutoriales</a>
+                <a href="#">Estado del Servicio</a>
+                <a href="#">Términos de Servicio</a>
+            </div>
+        </div>
+        <p>&copy; 2025 BitHosting. Todos los derechos reservados.</p>
+    </div>
+</footer>
+
+<!-- Debug Info -->
+<div class="debug-info" id="debugInfo">
+    URL: <span id="currentUrl"></span><br>
+    Status: <span id="authStatus">No logueado</span>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/carousel.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
