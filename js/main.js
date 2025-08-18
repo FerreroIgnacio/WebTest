@@ -99,3 +99,16 @@ function showNotification(message, type = 'info') {
         }, 300);
     }, 3000);
 }
+
+// Unblur hero effect on scroll
+window.addEventListener('scroll', function() {
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+    // Blur decreases as you scroll down, from 8px to 0px over 350px
+    const maxBlur = 8;
+    const minBlur = 0;
+    const scrollMax = 350;
+    const scrollY = Math.min(window.scrollY, scrollMax);
+    const blur = maxBlur - (scrollY / scrollMax) * (maxBlur - minBlur);
+    hero.style.setProperty('--hero-blur', blur + 'px');
+});
