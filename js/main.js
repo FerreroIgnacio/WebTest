@@ -6,12 +6,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Inicializar cuando carga la página
-window.onload = function() {
+// Inicializar cuando carga la página (robusto)
+window.addEventListener('load', async () => {
     console.log('Inicializando aplicación...');
-    initializeGoogleSignIn();
-    updateUserInterface();
-}
+    try {
+        if (typeof window.initializeGoogleSignIn === 'function') {
+            await window.initializeGoogleSignIn();
+        }
+    } catch (e) {
+        console.warn('No se pudo inicializar Google aún:', e);
+    }
+    try {
+        if (typeof window.updateUserInterface === 'function') {
+            window.updateUserInterface();
+        }
+    } catch (e) {
+        console.warn('No se pudo actualizar UI:', e);
+    }
+});
 
 // Smooth scrolling para los enlaces del menú
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -100,15 +112,78 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Unblur hero effect on scroll
-window.addEventListener('scroll', function() {
-    const hero = document.querySelector('.hero');
-    if (!hero) return;
-    // Blur decreases as you scroll down, from 8px to 0px over 350px
-    const maxBlur = 8;
-    const minBlur = 0;
-    const scrollMax = 350;
-    const scrollY = Math.min(window.scrollY, scrollMax);
-    const blur = maxBlur - (scrollY / scrollMax) * (maxBlur - minBlur);
-    hero.style.setProperty('--hero-blur', blur + 'px');
+// Reveal-on-scroll animations (no blur)
+(() => {
+    const REVEAL_SECTIONS = ['.carousel-section', '.features', '.pricing'];
+    const STAGGER_CONTAINERS = ['.features-grid', '.pricing-grid'];
+
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const el = entry.target;
+            const isSection = el.classList.contains('features') || el.classList.contains('pricing') || el.classList.contains('carousel-section');
+            const isStagger = el.classList.contains('stagger');
+
+            if (entry.isIntersecting) {
+                if (isSection) el.classList.add('revealed');
+                if (isStagger) el.classList.add('in-view');
+            } else {
+                // Remove classes when leaving so they can animate again later
+                if (isSection) el.classList.remove('revealed');
+                if (isStagger) el.classList.remove('in-view');
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Observe main sections
+        REVEAL_SECTIONS.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => io.observe(el));
+        });
+        // Add and observe stagger containers
+        STAGGER_CONTAINERS.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => {
+                el.classList.add('stagger');
+                io.observe(el);
+            });
+        });
+    });
+})();
+
+// Bind login button click to global loginWithGoogle
+document.addEventListener('DOMContentLoaded', function() {
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', async () => {
+            if (typeof window.loginWithGoogle === 'function') {
+                try { await window.loginWithGoogle(); } catch (e) { console.warn('Login error:', e); }
+            } else {
+                // Fallback: open modal if function is not ready yet
+                try { document.getElementById('loginModal')?.classList.add('show'); } catch {}
+            }
+        });
+    }
+
+    // Toggle dropdown al clickear avatar
+    const avatar = document.getElementById('userAvatar');
+    if (avatar) {
+        avatar.addEventListener('click', () => {
+            if (typeof window.toggleDropdown === 'function') window.toggleDropdown();
+        });
+    }
+
+    // Logout desde el menú
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (typeof window.logout === 'function') window.logout();
+        });
+    }
+
+    // Cerrar modal con la X
+    const closeLoginBtn = document.getElementById('closeLoginBtn');
+    if (closeLoginBtn) {
+        closeLoginBtn.addEventListener('click', () => {
+            if (typeof window.closeLoginModal === 'function') window.closeLoginModal();
+        });
+    }
 });

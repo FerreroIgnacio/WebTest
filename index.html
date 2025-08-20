@@ -13,7 +13,7 @@
     <div class="container">
         <nav>
             <div class="logo" style="display: flex; align-items: center; gap: 10px;">
-                <img src="https://via.placeholder.com/40x40?text=B" alt="Logo BitHosting" style="width:40px;height:40px;border-radius:8px;background:#00d4ff;">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%2300d4ff'/><stop offset='100%' stop-color='%2300b8e6'/></linearGradient></defs><rect rx='8' ry='8' width='40' height='40' fill='url(%23g)'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Segoe UI, Roboto, sans-serif' font-size='20' fill='%23001018'>B</text></svg>" alt="Logo BitHosting" style="width:40px;height:40px;border-radius:8px;background:#00d4ff;">
                 BitHosting
             </div>
             <div style="flex:1;"></div>
@@ -25,19 +25,16 @@
                 <li><a href="#cuenta" id="miCuentaLink" style="display: none;">Mi Cuenta</a></li>
             </ul>
             <div class="user-section">
-                <button class="login-btn" id="loginBtn" onclick="loginWithGoogle()">
+                <button class="login-btn" id="loginBtn">
                     <span>Iniciar Sesión</span>
                 </button>
                 <div class="user-profile" id="userProfile">
-                    <span class="user-name" id="userName" onclick="toggleDropdown()"></span>
+                    <span class="user-name" id="userName"></span>
                     <div class="user-dropdown">
-                        <img class="user-avatar" id="userAvatar" onclick="toggleDropdown()" src="" alt="User">
+                        <img class="user-avatar" id="userAvatar" src="" alt="User">
                         <div class="dropdown-menu" id="dropdownMenu">
                             <div class="dropdown-item">
                                 <a href="#panel">Panel de Control</a>
-                            </div>
-                            <div class="dropdown-item">
-                                <a href="#mis-vps">Mis VPS</a>
                             </div>
                             <div class="dropdown-item">
                                 <a href="#facturas">Facturación</a>
@@ -45,7 +42,7 @@
                             <div class="dropdown-item">
                                 <a href="#soporte">Soporte</a>
                             </div>
-                            <div class="dropdown-item" onclick="logout()">
+                            <div class="dropdown-item" id="logoutBtn">
                                 Cerrar Sesión
                             </div>
                         </div>
@@ -59,9 +56,11 @@
 <!-- Login Modal -->
 <div class="modal" id="loginModal">
     <div class="modal-content">
-        <span class="modal-close" onclick="closeLoginModal()">&times;</span>
+        <!-- Replace inline onclick with button id -->
+        <button type="button" class="modal-close" id="closeLoginBtn" aria-label="Cerrar">&times;</button>
         <h3>Iniciar Sesión</h3>
         <p>Usa tu cuenta de Google para acceder</p>
+        <!-- Programmatic render target -->
         <div id="google-signin-button"></div>
     </div>
 </div>
@@ -158,13 +157,13 @@
         <h2>Planes VPS Linux</h2>
         <div class="pricing-grid">
             <div class="pricing-card">
-                <div class="plan-name">Básico</div>
-                <div class="plan-price">$8.000</div>
+                <div class="plan-name">Mini</div>
+                <div class="plan-price">$5000</div>
                 <div class="plan-period">ARS / mes</div>
                 <ul class="plan-features">
                     <li>1 vCPU</li>
-                    <li>1 GB RAM</li>
-                    <li>25 GB SSD</li>
+                    <li>250 MB RAM</li>
+                    <li>5 GB SSD</li>
                     <li>1 IP Pública</li>
                     <li>Ubuntu/CentOS</li>
                     <li>Acceso SSH</li>
@@ -212,7 +211,7 @@
             <div class="footer-section">
                 <h3>Contacto</h3>
                 <a href="#">WhatsApp: +54 9 11 XXXX-XXXX</a>
-                <a href="#">Email: soporte@vpsargentina.com</a>
+                <a href="#">Email: soporte@XXXXX.com</a>
                 <a href="#">Buenos Aires, Argentina</a>
             </div>
             <div class="footer-section">

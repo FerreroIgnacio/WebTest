@@ -7,7 +7,9 @@ const dots = document.querySelectorAll('.carousel-dot');
 
 function updateCarousel() {
     const translateX = -currentSlideIndex * 100;
-    wrapper.style.transform = `translateX(${translateX}%)`;
+    if (wrapper) {
+        wrapper.style.transform = `translateX(${translateX}%)`;
+    }
 
     // Update dots
     dots.forEach((dot, index) => {
@@ -32,7 +34,11 @@ function currentSlide(slideIndex) {
     updateCarousel();
 }
 
-// Auto-advance carousel every 5 seconds
+// Expose functions for inline handlers
+window.changeSlide = changeSlide;
+window.currentSlide = currentSlide;
+
+// Auto-advance carousel every 5 segundos
 function startCarouselAutoplay() {
     setInterval(() => {
         changeSlide(1);
