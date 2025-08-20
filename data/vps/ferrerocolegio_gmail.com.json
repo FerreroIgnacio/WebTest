@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "vps-1755727906685",
+    "name": "VPS-6685",
+    "region": "Buenos Aires",
+    "status": "running",
+    "cpu": "1 vCPU",
+    "ram": "1024 MB",
+    "disk": "40 GB",
+    "used": "12 GB"
+  }
+]

@@ -96,6 +96,8 @@ function handleCredentialResponse(response) {
                         updateUserInterface();
                         closeLoginModal();
                         console.log('Usuario logueado vía servidor:', currentUser);
+                        // Redirect to control panel after successful login
+                        try { window.location.assign('/panel'); } catch {}
                         return; // listo
                     }
                 }
@@ -124,6 +126,8 @@ function handleCredentialResponse(response) {
             console.log('Usuario logueado (fallback):', currentUser);
             updateUserInterface();
             closeLoginModal();
+            // Redirect to control panel after successful login
+            try { window.location.assign('/panel'); } catch {}
 
         } catch (error) {
             console.error('Error al procesar login:', error);
@@ -339,9 +343,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Hook Panel de Control
     const panelLink = document.getElementById('panelLink');
     if (panelLink) {
-        panelLink.addEventListener('click', function(e) {
+        panelLink.addEventListener('click', async function(e) {
             e.preventDefault();
-            // navegar a la página del panel del servidor
+            // If not logged in, open login modal
+            if (!currentUser) {
+                try { showLoginModal(); } catch {}
+                return;
+            }
+            // Ensure server session exists before navigating
+            try {
+                const s = await getServerSession();
+                if (!s) { await setServerSession(currentUser); }
+            } catch {}
+            // Navigate to protected panel
             window.location.assign('/panel');
         });
     }

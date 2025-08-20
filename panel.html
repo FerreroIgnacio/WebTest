@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel de Control - BitHosting</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <style>
+    body{background:#0b0f14;color:#e6edf3}
+    .panel-wrap{max-width:1100px;margin:100px auto 40px;padding:0 20px}
+    .card{background:#0f141b;border:1px solid #161b22;border-radius:10px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;color:#9ca3af;font-size:12px}
+    .badge{background:#111827;border:1px solid #1f2937;color:#9ca3af;border-radius:999px;padding:4px 10px;font-size:12px}
+    .name{font-weight:600;margin-bottom:8px}
+    .bar{height:8px;background:#0e1621;border-radius:999px;overflow:hidden;border:1px solid #161b22;margin-top:8px}
+    .bar > span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#16a34a)}
+    .actions{display:flex;gap:8px;align-items:center}
+    a.btn{background:#00d4ff;color:#001018;text-decoration:none;border-radius:8px;padding:10px 14px;font-weight:600}
+    a.btn:hover{background:#00b8e6}
+    a.btn.secondary{background:#111827;color:#e6edf3;border:1px solid #1f2937}
+    a.btn.secondary:hover{background:#0f1722}
+    a.btn.del{background:#ef4444;color:#fff}
+    a.btn.del:hover{background:#dc2626}
+    header.sticky{position:fixed;top:0;left:0;right:0;background:#0d1117;border-bottom:1px solid #161b22;z-index:100}
+    header .container{display:flex;justify-content:space-between;align-items:center;padding:16px 20px}
+    .muted{color:#9ca3af}
+  </style>
+</head>
+<body>
+<header class="sticky">
+  <div class="container">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="https://via.placeholder.com/32x32?text=B" alt="Logo" style="border-radius:6px;background:#00d4ff" />
+      <strong>BitHosting · Panel de Control</strong>
+    </div>
+    <div>
+      <a href="/" class="btn secondary">Volver al inicio</a>
+    </div>
+  </div>
+</header>
+
+<main class="panel-wrap">
+  <section class="summary card" style="flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%">
+      <div>
+        <div id="userInfo" class="muted">Cargando usuario...</div>
+        <div style="margin-top:6px"><strong>Uso total de almacenamiento</strong></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="#" id="createVps" class="btn secondary">Crear VPS (debug)</a>
+        <a href="#" id="exportJson" class="btn">Exportar JSON</a>
+      </div>
+    </div>
+    <div class="bar" style="width:100%"><span id="totalBarFill" style="width:0%"></span></div>
+    <div class="muted" id="totalBarLabel">Cargando...</div>
+  </section>
+
+  <section id="vpsList">
+    <div class="muted">Cargando VPS...</div>
+  </section>
+</main>
+
+<script>
+  async function loadUser(){
+    try{
+      const res = await fetch('/api/session');
+      const data = await res.json();
+      const user = data && data.user;
+      const el = document.getElementById('userInfo');
+      if(!user){
+        // If somehow reached here without a session, bounce to home
+        location.replace('/');
+        return;
+      }
+      if(el){ el.textContent = (user.name||user.email||'Usuario'); }
+    }catch(e){
+      location.replace('/');
+    }
+  }
+
+  async function loadVps(){
+    try{
+      const res = await fetch('/api/vps');
+      if(!res.ok){ if(res.status===401) return location.replace('/'); throw new Error('HTTP '+res.status); }
+      const list = await res.json();
+      const totalDisk = list.reduce((s,v)=>s+parseInt((v.disk||'0')),0);
+      const totalUsed = list.reduce((s,v)=>s+parseInt((v.used||'0')),0);
+      const pct = totalDisk? Math.round((totalUsed/totalDisk)*100):0;
+      document.getElementById('totalBarFill').style.width = pct + '%';
+      document.getElementById('totalBarLabel').textContent = totalUsed + ' / ' + totalDisk + ' GB usados ('+pct+'%)';
+      const cards = list.map(item=>{
+        const total = parseInt(item.disk||'0');
+        const used = parseInt(item.used||'0');
+        const p = total? Math.min(100, Math.round((used/total)*100)) : 0;
+        return `
+          <div class="card" data-id="${item.id}">
+            <div style="flex:1">
+              <div class="name">${item.name} <span class="badge">${item.id}</span></div>
+              <div class="meta">
+                <span class="badge">${item.cpu}</span>
+                <span class="badge">${item.ram}</span>
+                <span class="badge">${item.disk}</span>
+                <span class="badge">${item.region}</span>
+                <span class="badge">${item.status}</span>
+              </div>
+              <div class="bar"><span style="width:${p}%"></span></div>
+              <div class="meta">${used} / ${total} GB usados (${p}%)</div>
+            </div>
+            <div class="actions">
+              <a href="#" class="btn del">Eliminar</a>
+              <a href="#" class="btn">Administrar</a>
+            </div>
+          </div>`
+      }).join('');
+      document.getElementById('vpsList').innerHTML = cards || '<div class="muted">Sin VPS</div>';
+    }catch(e){
+      document.getElementById('vpsList').innerHTML = '<div class="muted">Error al cargar VPS</div>';
+    }
+  }
+
+  async function createVps(){
+    try{ await fetch('/api/vps', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }); await loadVps(); }catch(e){}
+  }
+  async function deleteVps(id){
+    try{ await fetch('/api/vps/' + encodeURIComponent(id), { method: 'DELETE' }); await loadVps(); }catch(e){}
+  }
+
+  document.addEventListener('click', (e)=>{
+    const createBtn = e.target.closest('#createVps');
+    if(createBtn){ e.preventDefault(); createVps(); return; }
+    const delBtn = e.target.closest('.btn.del');
+    if(delBtn){ e.preventDefault(); const card = delBtn.closest('.card'); const id = card && card.getAttribute('data-id'); if(id) deleteVps(id); }
+    const exp = e.target.closest('#exportJson');
+    if(exp){
+      e.preventDefault();
+      (async ()=>{
+        try{
+          const res = await fetch('/api/vps');
+          const list = await res.json();
+          const url = URL.createObjectURL(new Blob([JSON.stringify(list,null,2)],{type:'application/json'}));
+          const a = document.createElement('a'); a.href = url; a.download = 'vps.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        }catch(e){}
+      })();
+    }
+  });
+
+  // Init
+  loadUser();
+  loadVps();
+</script>
+</body>
+</html>
+
