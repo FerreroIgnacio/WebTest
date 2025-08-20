@@ -289,7 +289,11 @@ function updateUserInterface() {
 // Toggle dropdown
 function toggleDropdown() {
     const dropdown = document.getElementById('dropdownMenu');
-    dropdown.classList.toggle('show');
+    const profile = document.getElementById('userProfile');
+    if (!dropdown || !profile) return;
+    const willShow = !dropdown.classList.contains('show');
+    dropdown.classList.toggle('show', willShow);
+    profile.setAttribute('aria-expanded', String(willShow));
 }
 
 // Simple session API helpers
@@ -332,12 +336,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentUser = srvUser;
         try { updateUserInterface(); } catch {}
     }
-    // Hook Panel de Control remains
-    const panelLink = document.querySelector('#dropdownMenu a[href="#panel"]');
+    // Hook Panel de Control
+    const panelLink = document.getElementById('panelLink');
     if (panelLink) {
         panelLink.addEventListener('click', function(e) {
             e.preventDefault();
-            openControlPanel();
+            // navegar a la página del panel del servidor
+            window.location.assign('/panel');
         });
     }
 });
@@ -544,7 +549,10 @@ function logout() {
     try { localStorage.removeItem('bh_currentUser'); } catch {}
 
     // Cerrar dropdown
-    document.getElementById('dropdownMenu').classList.remove('show');
+    const dd = document.getElementById('dropdownMenu');
+    const profile = document.getElementById('userProfile');
+    if (dd) dd.classList.remove('show');
+    if (profile) profile.setAttribute('aria-expanded', 'false');
 
     // Opcional: revocar acceso de Google
     if (googleInitialized) {
@@ -560,7 +568,11 @@ window.closeLoginModal = window.closeLoginModal || function() {
     try { document.getElementById('loginModal')?.classList.remove('show'); } catch {}
 };
 window.toggleDropdown = window.toggleDropdown || function() {
-    const dd = document.getElementById('dropdownMenu'); if (dd) dd.classList.toggle('show');
+    const dd = document.getElementById('dropdownMenu');
+    const profile = document.getElementById('userProfile');
+    const willShow = dd ? !dd.classList.contains('show') : false;
+    if (dd) dd.classList.toggle('show', willShow);
+    if (profile) profile.setAttribute('aria-expanded', String(willShow));
 };
 window.logout = window.logout || function() { console.warn('Logout not ready'); };
 

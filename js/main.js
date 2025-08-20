@@ -55,12 +55,16 @@ document.addEventListener('DOMContentLoaded', function() {
 // Cerrar dropdown al hacer click fuera
 document.addEventListener('click', function(event) {
     const dropdown = document.getElementById('dropdownMenu');
-    const avatar = document.getElementById('userAvatar');
+    const userProfile = document.getElementById('userProfile');
 
-    if (dropdown && dropdown.classList.contains('show') &&
-        !dropdown.contains(event.target) &&
-        event.target !== avatar) {
+    if (!dropdown || !userProfile) return;
+
+    const clickedInsideProfile = userProfile.contains(event.target);
+    const clickedInsideMenu = dropdown.contains(event.target);
+
+    if (dropdown.classList.contains('show') && !clickedInsideProfile && !clickedInsideMenu) {
         dropdown.classList.remove('show');
+        userProfile.setAttribute('aria-expanded', 'false');
     }
 });
 
@@ -163,11 +167,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Toggle dropdown al clickear avatar
-    const avatar = document.getElementById('userAvatar');
-    if (avatar) {
-        avatar.addEventListener('click', () => {
+    // Toggle dropdown al clickear todo el recuadro de perfil
+    const userProfile = document.getElementById('userProfile');
+    if (userProfile) {
+        userProfile.addEventListener('click', (e) => {
+            // Evita que clics en enlaces internos (como logout) abran/cieran sin querer
+            const isInteractive = e.target.closest('a, button, .dropdown-item');
+            if (isInteractive && !e.target.closest('#dropdownMenu')) return;
             if (typeof window.toggleDropdown === 'function') window.toggleDropdown();
+        });
+        // Accesible con teclado
+        userProfile.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (typeof window.toggleDropdown === 'function') window.toggleDropdown();
+            }
         });
     }
 

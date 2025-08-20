@@ -103,36 +103,74 @@ header nav {
     background: #00b8e6;
 }
 
+/* Make entire user-profile a clickable hitbox */
 .user-profile {
     display: none;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px; /* consistent spacing regardless of name length */
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
 }
 
 .user-profile.active {
     display: flex;
 }
 
+.user-profile:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+.user-profile:focus {
+    outline: 2px solid #00d4ff66;
+    outline-offset: 2px;
+}
+
+/* Name spacing and truncation */
+.user-name {
+    color: white;
+    font-size: 0.9rem;
+    max-width: clamp(80px, 14vw, 160px); /* adapts to viewport */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 2px; /* subtle space before avatar */
+}
+
+/* Caret icon to the right of the avatar */
+.dropdown-caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #eef2f7;
+    margin-left: 4px;
+    transition: transform 160ms ease;
+}
+
+.user-profile[aria-expanded="true"] .dropdown-caret {
+    transform: rotate(180deg);
+}
+
+/* Avatar keeps size; hitbox is the wrapper */
 .user-avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     border: 2px solid #00d4ff;
-    cursor: pointer;
     transition: transform 0.3s;
+    flex: 0 0 auto;
 }
 
 .user-avatar:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
-.user-name {
-    color: white;
-    font-size: 0.9rem;
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+/* Space between login button and profile adapts with content */
+.user-section {
+    gap: 1.25rem;
 }
 
 /* Dropdown Menu */

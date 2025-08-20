@@ -13,7 +13,7 @@
     <div class="container">
         <nav>
             <div class="logo" style="display: flex; align-items: center; gap: 10px;">
-                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%2300d4ff'/><stop offset='100%' stop-color='%2300b8e6'/></linearGradient></defs><rect rx='8' ry='8' width='40' height='40' fill='url(%23g)'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Segoe UI, Roboto, sans-serif' font-size='20' fill='%23001018'>B</text></svg>" alt="Logo BitHosting" style="width:40px;height:40px;border-radius:8px;background:#00d4ff;">
+                <img src="https://via.placeholder.com/40x40?text=B" alt="Logo BitHosting" style="width:40px;height:40px;border-radius:8px;background:#00d4ff;">
                 BitHosting
             </div>
             <div style="flex:1;"></div>
@@ -28,23 +28,22 @@
                 <button class="login-btn" id="loginBtn">
                     <span>Iniciar Sesión</span>
                 </button>
-                <div class="user-profile" id="userProfile">
+                <div class="user-profile" id="userProfile" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
                     <span class="user-name" id="userName"></span>
-                    <div class="user-dropdown">
-                        <img class="user-avatar" id="userAvatar" src="" alt="User">
-                        <div class="dropdown-menu" id="dropdownMenu">
-                            <div class="dropdown-item">
-                                <a href="#panel">Panel de Control</a>
-                            </div>
-                            <div class="dropdown-item">
-                                <a href="#facturas">Facturación</a>
-                            </div>
-                            <div class="dropdown-item">
-                                <a href="#soporte">Soporte</a>
-                            </div>
-                            <div class="dropdown-item" id="logoutBtn">
-                                Cerrar Sesión
-                            </div>
+                    <img class="user-avatar" id="userAvatar" src="" alt="User">
+                    <span class="dropdown-caret" aria-hidden="true"></span>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <div class="dropdown-item">
+                            <a href="/panel" id="panelLink">Panel de Control</a>
+                        </div>
+                        <div class="dropdown-item">
+                            <a href="#facturas">Facturación</a>
+                        </div>
+                        <div class="dropdown-item">
+                            <a href="#soporte">Soporte</a>
+                        </div>
+                        <div class="dropdown-item" id="logoutBtn">
+                            Cerrar Sesión
                         </div>
                     </div>
                 </div>
@@ -60,6 +59,22 @@
         <button type="button" class="modal-close" id="closeLoginBtn" aria-label="Cerrar">&times;</button>
         <h3>Iniciar Sesión</h3>
         <p>Usa tu cuenta de Google para acceder</p>
+        <!-- Declarative Google Sign-In fallback -->
+        <div id="google-signin-fallback">
+            <div id="g_id_onload"
+                 data-client_id="614144050505-a02n5fod2ofne58nt9i01tj5ok977eot.apps.googleusercontent.com"
+                 data-context="signin"
+                 data-ux_mode="popup"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false"></div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-shape="pill"
+                 data-logo_alignment="left"></div>
+        </div>
         <!-- Programmatic render target -->
         <div id="google-signin-button"></div>
     </div>
