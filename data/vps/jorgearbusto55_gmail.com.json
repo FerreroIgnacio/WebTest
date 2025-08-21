@@ -1,12 +1,1 @@
-[
-  {
-    "id": "vps-1755808869179",
-    "name": "VPS-9179",
-    "region": "Buenos Aires",
-    "status": "running",
-    "cpu": "1 vCPU",
-    "ram": "1024 MB",
-    "disk": "160 GB",
-    "used": "48 GB"
-  }
-]
+[]

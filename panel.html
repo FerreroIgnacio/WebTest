@@ -5,49 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Panel de Control - BitHosting</title>
   <link rel="stylesheet" href="/css/styles.css" />
-  <style>
-    body{background:#0b0f14;color:#e6edf3; padding-top: var(--ph);} /* ensure content starts below fixed header */
-    :root{--ph:72px;--sbw:240px;--sbwc:64px} /* default header height, will be updated via JS */
-    .panel-wrap{max-width:1100px;margin:0 auto 40px;padding:0 20px}
-    .card{background:#0f141b;border:1px solid #161b22;border-radius:10px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
-    .meta{display:flex;gap:10px;flex-wrap:wrap;color:#9ca3af;font-size:12px}
-    .badge{background:#111827;border:1px solid #1f2937;color:#9ca3af;border-radius:999px;padding:4px 10px;font-size:12px}
-    .name{font-weight:600;margin-bottom:8px}
-    .bar{height:8px;background:#0e1621;border-radius:999px;overflow:hidden;border:1px solid #161b22;margin-top:8px}
-    .bar > span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#16a34a)}
-    .actions{display:flex;gap:8px;align-items:center}
-    a.btn{background:#00d4ff;color:#001018;text-decoration:none;border-radius:8px;padding:10px 14px;font-weight:600}
-    a.btn:hover{background:#00b8e6}
-    a.btn.secondary{background:#111827;color:#e6edf3;border:1px solid #1f2937}
-    a.btn.secondary:hover{background:#0f1722}
-    a.btn.del{background:#ef4444;color:#fff}
-    a.btn.del:hover{background:#dc2626}
-    header.sticky{position:fixed;top:0;left:0;right:0;background:#0d1117;border-bottom:1px solid #161b22;z-index:100}
-    header .container{display:flex;justify-content:space-between;align-items:center;padding:16px 20px}
-    .muted{color:#9ca3af}
-    /* Sidebar */
-    .sidebar{position:fixed;top:var(--ph);left:0;bottom:0;width:var(--sbw);background:#0c1219;border-right:1px solid #161b22;transition:width .25s ease;overflow:hidden;z-index:90}
-    body.sb-collapsed .sidebar{width:var(--sbwc)}
-    .sb-brand{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #161b22}
-    .sb-brand strong{font-size:14px}
-    .sb-nav{display:flex;flex-direction:column;padding:8px}
-    .sb-link{color:#e6edf3;text-decoration:none;padding:10px 12px;border-radius:8px;display:flex;gap:10px;align-items:center;transition:background .2s ease}
-    .sb-link:hover{background:#101722}
-    .sb-ico{width:18px;height:18px;display:inline-grid;place-items:center;background:#0d1117;border:1px solid #1b2330;border-radius:6px;font-size:12px;color:#00d4ff}
-    .sb-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    /* Content shifts with sidebar */
-    .main-with-sidebar{margin-left:var(--sbw);transition:margin-left .25s ease}
-    body.sb-collapsed .main-with-sidebar{margin-left:var(--sbwc)}
-    /* Drag-like handle that moves with sidebar */
-    .sb-handle{position:fixed;top:calc(var(--ph) + 12px);left:calc(var(--sbw) - 14px);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#0c1219;color:#e6edf3;border:1px solid #161b22;cursor:pointer;z-index:101;transition:left .25s ease,background .2s ease,transform .2s ease}
-    body.sb-collapsed .sb-handle{left:calc(var(--sbwc) - 14px)}
-    .sb-handle:hover{background:#101722}
-    .sb-handle:active{transform:scale(0.96)}
-    .sb-handle-icon{font-size:16px;line-height:1}
-    /* Header logo link */
-    .panel-logo{display:flex;align-items:center;gap:10px;color:#e6edf3;text-decoration:none}
-    .panel-logo:hover{opacity:.9}
-  </style>
+  <link rel="stylesheet" href="/css/panel.css" />
 </head>
 <body>
 <header class="sticky">
@@ -95,7 +53,7 @@
       <span class="sb-ico">🏠</span>
       <span class="sb-text">Dashboard</span>
     </a>
-    <a class="sb-link" href="#vps">
+    <a class="sb-link" href="#vpsList">
       <span class="sb-ico">🖥️</span>
       <span class="sb-text">Mis VPS</span>
     </a>
@@ -120,6 +78,8 @@
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <a href="#" id="createVps" class="btn secondary">Crear VPS (debug)</a>
+        <a href="#" id="createCtBtn" class="btn">Crear CT Proxmox</a>
+        <a href="#" id="createVmBtn" class="btn">Crear VM Proxmox</a>
         <a href="#" id="exportJson" class="btn">Exportar JSON</a>
       </div>
     </div>
@@ -130,124 +90,114 @@
   <section id="vpsList">
     <div class="muted">Cargando VPS...</div>
   </section>
+
+  <section id="vmsSection" class="card" style="flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;margin-bottom:8px">
+      <strong>Proxmox VMs</strong>
+      <a href="#" id="refreshVms" class="btn secondary">Actualizar</a>
+    </div>
+    <div id="vmsList" class="muted">Cargando VMs...</div>
+  </section>
+
+  <!-- Optional placeholder sections to resolve anchors -->
+  <section id="facturacion" class="card" style="display:none"><div class="muted">Facturación</div></section>
+  <section id="soporte" class="card" style="display:none"><div class="muted">Soporte</div></section>
 </main>
 
-<script>
-  // Dynamically sync CSS var --ph with actual header height to avoid overlap
-  (function(){
-    function setHeaderVar(){
-      const h = document.querySelector('header.sticky');
-      if(!h) return;
-      const ph = h.offsetHeight || 72;
-      document.documentElement.style.setProperty('--ph', ph + 'px');
-    }
-    window.addEventListener('load', setHeaderVar);
-    window.addEventListener('resize', setHeaderVar);
-  })();
+<!-- Proxmox Create CT Modal -->
+<div class="modal" id="ctModal" role="dialog" aria-modal="true" aria-labelledby="ctTitle">
+  <div class="modal-content" style="max-width:520px">
+    <button type="button" class="modal-close" id="ctCloseBtn" aria-label="Cerrar">&times;</button>
+    <h3 id="ctTitle" style="margin-bottom:10px">Crear Contenedor LXC</h3>
+    <form id="ctForm">
+      <div class="form-row">
+        <label for="ctHostname">Hostname</label>
+        <input id="ctHostname" name="hostname" type="text" required placeholder="mi-contenedor" />
+      </div>
+      <div class="form-row">
+        <label for="ctPassword">Password root</label>
+        <input id="ctPassword" name="password" type="password" required placeholder="********" />
+      </div>
+      <div class="form-row">
+        <label for="ctTemplate">Template</label>
+        <select id="ctTemplate" name="template"></select>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="ctCores">Cores</label>
+          <input id="ctCores" name="cores" type="number" min="1" value="1" />
+        </div>
+        <div class="form-row">
+          <label for="ctMemory">Memoria (MB)</label>
+          <input id="ctMemory" name="memory" type="number" min="256" step="256" value="1024" />
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="ctDisk">Disco (GB)</label>
+          <input id="ctDisk" name="rootfs" type="number" min="4" step="1" value="8" />
+        </div>
+        <div class="form-row">
+          <label for="ctSwap">Swap (MB)</label>
+          <input id="ctSwap" name="swap" type="number" min="0" step="128" value="512" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="ctBridge">Bridge</label>
+        <input id="ctBridge" name="netBridge" type="text" value="vmbr0" />
+      </div>
+      <div class="form-row" style="display:flex;align-items:center;gap:8px">
+        <input id="ctStart" name="start" type="checkbox" checked />
+        <label for="ctStart" style="margin:0">Iniciar al crear</label>
+      </div>
+      <div id="ctStatus" class="muted" aria-live="polite" style="min-height:20px;margin:8px 0 4px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
+        <button type="button" class="btn secondary" id="ctCancelBtn">Cancelar</button>
+        <button type="submit" class="btn" id="ctSubmitBtn">Crear</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-  // Sidebar state
-  (function(){
-    const KEY='bh_sb_collapsed';
-    try{ if(localStorage.getItem(KEY)==='1'){ document.body.classList.add('sb-collapsed'); } }catch(e){}
-    const handle=document.getElementById('sbHandle');
-    const updateAria=()=>{ handle?.setAttribute('aria-expanded', String(!document.body.classList.contains('sb-collapsed'))); };
-    updateAria();
-    handle?.addEventListener('click',()=>{
-      document.body.classList.toggle('sb-collapsed');
-      updateAria();
-      try{ localStorage.setItem(KEY, document.body.classList.contains('sb-collapsed') ? '1' : '0'); }catch(e){}
-    });
-  })();
+<!-- Proxmox Create VM Modal -->
+<div class="modal" id="vmModal" role="dialog" aria-modal="true" aria-labelledby="vmTitle">
+  <div class="modal-content" style="max-width:520px">
+    <button type="button" class="modal-close" id="vmCloseBtn" aria-label="Cerrar">&times;</button>
+    <h3 id="vmTitle" style="margin-bottom:10px">Crear VM (QEMU)</h3>
+    <form id="vmForm">
+      <div class="form-row">
+        <label for="vmName">Nombre</label>
+        <input id="vmName" name="name" type="text" required placeholder="mi-vm" />
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="vmCores">Cores</label>
+          <input id="vmCores" name="cores" type="number" min="1" value="1" />
+        </div>
+        <div class="form-row">
+          <label for="vmMemory">Memoria (MB)</label>
+          <input id="vmMemory" name="memory" type="number" min="256" step="256" value="1024" />
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="vmDisk">Disco (GB)</label>
+          <input id="vmDisk" name="disk" type="number" min="5" step="1" value="10" />
+        </div>
+        <div class="form-row">
+          <label for="vmBridge">Bridge</label>
+          <input id="vmBridge" name="bridge" type="text" value="vmbr0" />
+        </div>
+      </div>
+      <div id="vmStatus" class="muted" aria-live="polite" style="min-height:20px;margin:8px 0 4px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
+        <button type="button" class="btn secondary" id="vmCancelBtn">Cancelar</button>
+        <button type="submit" class="btn" id="vmSubmitBtn">Crear</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-  // Logo -> home
-  document.getElementById('panelLogo')?.addEventListener('click', function(e){ /* default navigation to / */ });
-
-  async function loadUser(){
-    try{
-      const res = await fetch('/api/session');
-      const data = await res.json();
-      const user = data && data.user;
-      const el = document.getElementById('userInfo');
-      if(!user){
-        // If somehow reached here without a session, bounce to home
-        location.replace('/');
-        return;
-      }
-      if(el){ el.textContent = (user.name||user.email||'Usuario'); }
-    }catch(e){
-      location.replace('/');
-    }
-  }
-
-  async function loadVps(){
-    try{
-      const res = await fetch('/api/vps');
-      if(!res.ok){ if(res.status===401) return location.replace('/'); throw new Error('HTTP '+res.status); }
-      const list = await res.json();
-      const totalDisk = list.reduce((s,v)=>s+parseInt((v.disk||'0')),0);
-      const totalUsed = list.reduce((s,v)=>s+parseInt((v.used||'0')),0);
-      const pct = totalDisk? Math.round((totalUsed/totalDisk)*100):0;
-      document.getElementById('totalBarFill').style.width = pct + '%';
-      document.getElementById('totalBarLabel').textContent = totalUsed + ' / ' + totalDisk + ' GB usados ('+pct+'%)';
-      const cards = list.map(item=>{
-        const total = parseInt(item.disk||'0');
-        const used = parseInt(item.used||'0');
-        const p = total? Math.min(100, Math.round((used/total)*100)) : 0;
-        return `
-          <div class="card" data-id="${item.id}">
-            <div style="flex:1">
-              <div class="name">${item.name} <span class="badge">${item.id}</span></div>
-              <div class="meta">
-                <span class="badge">${item.cpu}</span>
-                <span class="badge">${item.ram}</span>
-                <span class="badge">${item.disk}</span>
-                <span class="badge">${item.region}</span>
-                <span class="badge">${item.status}</span>
-              </div>
-              <div class="bar"><span style="width:${p}%"></span></div>
-              <div class="meta">${used} / ${total} GB usados (${p}%)</div>
-            </div>
-            <div class="actions">
-              <a href="#" class="btn del">Eliminar</a>
-              <a href="#" class="btn">Administrar</a>
-            </div>
-          </div>`
-      }).join('');
-      document.getElementById('vpsList').innerHTML = cards || '<div class="muted">Sin VPS</div>';
-    }catch(e){
-      document.getElementById('vpsList').innerHTML = '<div class="muted">Error al cargar VPS</div>';
-    }
-  }
-
-  async function createVps(){
-    try{ await fetch('/api/vps', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }); await loadVps(); }catch(e){}
-  }
-  async function deleteVps(id){
-    try{ await fetch('/api/vps/' + encodeURIComponent(id), { method: 'DELETE' }); await loadVps(); }catch(e){}
-  }
-
-  document.addEventListener('click', (e)=>{
-    const createBtn = e.target.closest('#createVps');
-    if(createBtn){ e.preventDefault(); createVps(); return; }
-    const delBtn = e.target.closest('.btn.del');
-    if(delBtn){ e.preventDefault(); const card = delBtn.closest('.card'); const id = card && card.getAttribute('data-id'); if(id) deleteVps(id); }
-    const exp = e.target.closest('#exportJson');
-    if(exp){
-      e.preventDefault();
-      (async ()=>{
-        try{
-          const res = await fetch('/api/vps');
-          const list = await res.json();
-          const url = URL.createObjectURL(new Blob([JSON.stringify(list,null,2)],{type:'application/json'}));
-          const a = document.createElement('a'); a.href = url; a.download = 'vps.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-        }catch(e){}
-      })();
-    }
-  });
-
-  // Init
-  loadUser();
-  loadVps();
-</script>
+<script src="/js/panel.js"></script>
 </body>
 </html>

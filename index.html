@@ -29,7 +29,7 @@
             <ul class="nav-links">
                 <li><a href="#inicio">Inicio</a></li>
                 <li><a href="#precios">Precios</a></li>
-                <li><a href="#soporte">Soporte</a></li>
+                <li><a href="#contacto">Soporte</a></li>
                 <li><a href="#contacto">Contacto</a></li>
                 <li><a href="#cuenta" id="miCuentaLink" style="display: none;">Mi Cuenta</a></li>
             </ul>
@@ -49,7 +49,7 @@
                             <a href="#facturas">Facturación</a>
                         </div>
                         <div class="dropdown-item">
-                            <a href="#soporte">Soporte</a>
+                            <a href="#contacto">Soporte</a>
                         </div>
                         <div class="dropdown-item" id="logoutBtn">
                             Cerrar Sesión
@@ -95,54 +95,61 @@
         <div class="hero-content">
             <h1>BitHosting</h1>
             <p>Servidores virtuales de alto rendimiento con baja latencia, soporte en español y precios en pesos</p>
-            <a href="#pricing" class="cta-button">Ver Planes</a>
+            <a href="#precios" class="cta-button">Ver Planes</a>
         </div>
-    </div>
-</section>
-<!-- Carousel Section -->
-<section class="carousel-section">
-    <div class="container">
-        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">Nuestros Servicios</h2>
-        <div class="carousel-container">
-            <div class="carousel-wrapper" id="carouselWrapper">
-                <div class="carousel-slide">
-                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=400&fit=crop" alt="Datacenter">
-                    <div class="carousel-caption">
-                        <h3>Infraestructura Moderna</h3>
-                        <p>Servidores de última generación con SSD y procesadores Intel de alto rendimiento</p>
+        <!-- Integrated carousel inside hero as full background -->
+        <section class="carousel-section hero-carousel">
+            <!-- removed section heading for full-bg integration -->
+            <div class="carousel-container">
+                <div class="carousel-wrapper" id="carouselWrapper">
+                    <!-- ...existing slides... -->
+                    <div class="carousel-slide">
+                        <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1600&h=900&fit=crop" alt="Datacenter">
+                        <div class="carousel-caption">
+                            <h3>Infraestructura Moderna</h3>
+                            <p>Servidores de última generación con SSD y procesadores Intel de alto rendimiento</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&h=900&fit=crop" alt="Conexión">
+                        <div class="carousel-caption">
+                            <h3>Conectividad Premium</h3>
+                            <p>Conexión directa a Buenos Aires con latencia ultra baja para usuarios argentinos</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://images.unsplash.com/photo-1560472355-536de3962603?w=1600&h=900&fit=crop" alt="Soporte">
+                        <div class="carousel-caption">
+                            <h3>Soporte 24/7</h3>
+                            <p>Atención técnica especializada en español durante horarios comerciales argentinos</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&h=900&fit=crop" alt="Seguridad">
+                        <div class="carousel-caption">
+                            <h3>Máxima Seguridad</h3>
+                            <p>Backups automáticos, firewall configurado y monitoreo constante de todos los servicios</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://static.vecteezy.com/system/resources/previews/022/277/081/large_2x/data-center-server-room-or-database-cloud-storage-free-vector.jpg" alt="Data center">
+                        <div class="carousel-caption">
+                            <h3>Data Center</h3>
+                            <p>Capacidad y rendimiento para tus proyectos en la nube</p>
+                        </div>
                     </div>
                 </div>
-                <div class="carousel-slide">
-                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=400&fit=crop" alt="Conexión">
-                    <div class="carousel-caption">
-                        <h3>Conectividad Premium</h3>
-                        <p>Conexión directa a Buenos Aires con latencia ultra baja para usuarios argentinos</p>
-                    </div>
-                </div>
-                <div class="carousel-slide">
-                    <img src="https://images.unsplash.com/photo-1560472355-536de3962603?w=800&h=400&fit=crop" alt="Soporte">
-                    <div class="carousel-caption">
-                        <h3>Soporte 24/7</h3>
-                        <p>Atención técnica especializada en español durante horarios comerciales argentinos</p>
-                    </div>
-                </div>
-                <div class="carousel-slide">
-                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop" alt="Seguridad">
-                    <div class="carousel-caption">
-                        <h3>Máxima Seguridad</h3>
-                        <p>Backups automáticos, firewall configurado y monitoreo constante de todos los servicios</p>
-                    </div>
-                </div>
+                <button class="carousel-nav carousel-prev" onclick="changeSlide(-1)">‹</button>
+                <button class="carousel-nav carousel-next" onclick="changeSlide(1)">›</button>
             </div>
-            <button class="carousel-nav carousel-prev" onclick="changeSlide(-1)">‹</button>
-            <button class="carousel-nav carousel-next" onclick="changeSlide(1)">›</button>
-        </div>
-        <div class="carousel-dots">
-            <span class="carousel-dot active" onclick="currentSlide(1)"></span>
-            <span class="carousel-dot" onclick="currentSlide(2)"></span>
-            <span class="carousel-dot" onclick="currentSlide(3)"></span>
-            <span class="carousel-dot" onclick="currentSlide(4)"></span>
-        </div>
+            <div class="carousel-dots">
+                <span class="carousel-dot active" onclick="currentSlide(1)"></span>
+                <span class="carousel-dot" onclick="currentSlide(2)"></span>
+                <span class="carousel-dot" onclick="currentSlide(3)"></span>
+                <span class="carousel-dot" onclick="currentSlide(4)"></span>
+                <span class="carousel-dot" onclick="currentSlide(5)"></span>
+            </div>
+        </section>
     </div>
 </section>
 

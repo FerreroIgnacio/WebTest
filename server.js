@@ -2,6 +2,9 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
+const querystring = require('querystring');
+const pmx = require('./lib/proxmox');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -255,4 +258,117 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-//root key 4e003e52-2917-4d46-bc1f-7524094b1f88
+
+// List available CT templates (via lib)
+app.get('/api/proxmox/templates', async (req, res) => {
+  if (!pmx.haveConfig()) return res.status(501).json({ error: 'Proxmox no configurado (PMX_* env vars)' });
+  try {
+    const list = await pmx.listCTTemplates();
+    res.json({ templates: list });
+  } catch (e) {
+    res.status(500).json({ error: 'No se pudieron listar templates', detail: e?.response || e.message });
+  }
+});
+
+// Create a Proxmox LXC container (via lib)
+app.post('/api/proxmox/ct', async (req, res) => {
+  const ip = getClientIp(req);
+  const user = sessionsByIp.get(ip);
+  if (!user) return res.status(401).json({ error: 'not authenticated' });
+  if (!pmx.haveConfig()) return res.status(501).json({ error: 'Proxmox no configurado (PMX_* env vars)' });
+
+  try {
+    const { hostname, password, template, storage, cores, memory, swap, rootfs, netBridge, start } = req.body || {};
+    if (!hostname) return res.status(400).json({ error: 'hostname requerido' });
+    if (!password) return res.status(400).json({ error: 'password requerido' });
+
+    const { upid, vmid } = await pmx.createCT({ hostname, password, template, storage, cores, memory, swap, rootfs, netBridge, start });
+    res.status(202).json({ upid, vmid, node: process.env.PMX_NODE || 'pve' });
+  } catch (e) {
+    res.status(500).json({ error: 'No se pudo crear el CT', detail: e?.response || e.message });
+  }
+});
+
+// Poll task status (via lib)
+app.get('/api/proxmox/ct/:upid/status', async (req, res) => {
+  if (!pmx.haveConfig()) return res.status(501).json({ error: 'Proxmox no configurado (PMX_* env vars)' });
+  try {
+    const data = await pmx.getTaskStatus(req.params.upid);
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: 'No se pudo obtener el estado', detail: e?.response || e.message });
+  }
+});
+
+// ===== VM endpoints (QEMU) using lib =====
+// List VMs
+app.get('/api/proxmox/vms', async (req, res) => {
+  const ip = getClientIp(req);
+  const user = sessionsByIp.get(ip);
+  if (!user) return res.status(401).json({ error: 'not authenticated' });
+  if (!pmx.haveConfig()) return res.status(501).json({ error: 'Proxmox no configurado (PMX_* env vars)' });
+  try {
+    const list = await pmx.listVMs();
+    res.json(list);
+  } catch (e) {
+    res.status(500).json({ error: 'No se pudieron listar VMs', detail: e?.response || e.message });
+  }
+});
+
+// Create VM
+app.post('/api/proxmox/vm', async (req, res) => {
+  const ip = getClientIp(req);
+  const user = sessionsByIp.get(ip);
+  if (!user) return res.status(401).json({ error: 'not authenticated' });
+  if (!pmx.haveConfig()) return res.status(501).json({ error: 'Proxmox no configurado (PMX_* env vars)' });
+  try {
+    const { name, cores, memory, disk, storage, bridge } = req.body || {};
+    if (!name) return res.status(400).json({ error: 'name requerido' });
+    const { upid, vmid } = await pmx.createVM({ name, cores, memory, disk, storage, bridge });
+    res.status(202).json({ upid, vmid });
+  } catch (e) {
+    res.status(500).json({ error: 'No se pudo crear la VM', detail: e?.response || e.message });
+  }
+});
+
+// Delete VM
+app.delete('/api/proxmox/vm/:vmid', async (req, res) => {
+  const ip = getClientIp(req);
+  const user = sessionsByIp.get(ip);
+  if (!user) return res.status(401).json({ error: 'not authenticated' });
+  if (!pmx.haveConfig()) return res.status(501).json({ error: 'Proxmox no configurado (PMX_* env vars)' });
+  try {
+    const data = await pmx.deleteVM(req.params.vmid);
+    res.json({ ok: true, data });
+  } catch (e) {
+    res.status(500).json({ error: 'No se pudo eliminar la VM', detail: e?.response || e.message });
+  }
+});
+
+// Start VM
+app.post('/api/proxmox/vm/:vmid/start', async (req, res) => {
+  if (!pmx.haveConfig()) return res.status(501).json({ error: 'Proxmox no configurado (PMX_* env vars)' });
+  try { const data = await pmx.startVM(req.params.vmid); res.json({ ok: true, data }); }
+  catch (e) { res.status(500).json({ error: 'No se pudo iniciar la VM', detail: e?.response || e.message }); }
+});
+
+// Stop VM
+app.post('/api/proxmox/vm/:vmid/stop', async (req, res) => {
+  if (!pmx.haveConfig()) return res.status(501).json({ error: 'Proxmox no configurado (PMX_* env vars)' });
+  try { const data = await pmx.stopVM(req.params.vmid); res.json({ ok: true, data }); }
+  catch (e) { res.status(500).json({ error: 'No se pudo detener la VM', detail: e?.response || e.message }); }
+});
+
+// Reboot VM
+app.post('/api/proxmox/vm/:vmid/reboot', async (req, res) => {
+  if (!pmx.haveConfig()) return res.status(501).json({ error: 'Proxmox no configurado (PMX_* env vars)' });
+  try { const data = await pmx.rebootVM(req.params.vmid); res.json({ ok: true, data }); }
+  catch (e) { res.status(500).json({ error: 'No se pudo reiniciar la VM', detail: e?.response || e.message }); }
+});
+
+// VM info
+app.get('/api/proxmox/vm/:vmid/info', async (req, res) => {
+  if (!pmx.haveConfig()) return res.status(501).json({ error: 'Proxmox no configurado (PMX_* env vars)' });
+  try { const data = await pmx.getVMInfo(req.params.vmid); res.json(data || {}); }
+  catch (e) { res.status(500).json({ error: 'No se pudo obtener info de VM', detail: e?.response || e.message }); }
+});
