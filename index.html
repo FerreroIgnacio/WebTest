@@ -12,11 +12,20 @@
 <header>
     <div class="container">
         <nav>
-            <div class="logo" style="display: flex; align-items: center; gap: 10px;">
-                <img src="https://via.placeholder.com/40x40?text=B" alt="Logo BitHosting" style="width:40px;height:40px;border-radius:8px;background:#00d4ff;">
+            <a href="/" id="siteLogo" class="logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+                <!-- Inline SVG logo to avoid remote loading issues -->
+                <svg class="bh-logo" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="bhg" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#00d4ff"/>
+                            <stop offset="100%" stop-color="#00b8e6"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="0" y="0" width="40" height="40" rx="8" ry="8" fill="url(#bhg)"/>
+                    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Segoe UI, Roboto, sans-serif" font-size="20" fill="#001018">B</text>
+                </svg>
                 BitHosting
-            </div>
-            <div style="flex:1;"></div>
+            </a>
             <ul class="nav-links">
                 <li><a href="#inicio">Inicio</a></li>
                 <li><a href="#precios">Precios</a></li>

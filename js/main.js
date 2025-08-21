@@ -200,4 +200,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof window.closeLoginModal === 'function') window.closeLoginModal();
         });
     }
+
+    // Logo click: go home or scroll to top if already on home
+    const siteLogo = document.getElementById('siteLogo');
+    if (siteLogo) {
+        siteLogo.addEventListener('click', function(e) {
+            const onHome = location.pathname === '/' || /\/index\.html$/i.test(location.pathname);
+            if (onHome) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    }
 });

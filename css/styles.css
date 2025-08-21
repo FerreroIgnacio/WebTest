@@ -38,14 +38,18 @@ header nav {
     display: flex;
     align-items: center;
     width: 100%;
-    justify-content: flex-start;
+    justify-content: space-between; /* align left and right groups flush to container edges */
+    gap: 12px;
 }
 
 .logo {
     font-size: 1.5rem;
     font-weight: bold;
     color: #00d4ff;
-    margin-right: auto;
+    margin-right: 0; /* remove auto margin that created unwanted spacing */
+    display: inline-flex; /* ensure vertical centering with img */
+    align-items: center;
+    gap: 10px;
 }
 
 .nav-links, .user-section {
@@ -175,6 +179,7 @@ header nav {
 /* Space between login button and profile adapts with content */
 .user-section {
     gap: 1.25rem;
+    margin-left: 0;
 }
 
 /* Dropdown Menu */
